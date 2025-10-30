@@ -1,7 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.44.2'
-// Utilisation d'une librairie de hachage compatible avec Deno Edge Functions
-import { compare } from "https://deno.land/x/bcryptjs@v2.4.3/mod.ts";
+// Importation depuis un CDN fiable (esm.sh) pour résoudre le "Module not found"
+import { compare } from "https://esm.sh/bcryptjs@2.4.3";
 import { create } from "https://deno.land/x/djwt@v3.0.2/mod.ts";
 
 const corsHeaders = {
@@ -56,7 +56,7 @@ serve(async (req) => {
       })
     }
 
-    // Vérifie le mot de passe
+    // `compare` de bcryptjs est asynchrone
     const passwordMatch = await compare(password, user.password_hash);
     if (!passwordMatch) {
       return new Response(JSON.stringify({ error: "Identifiants incorrects." }), {
