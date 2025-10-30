@@ -178,7 +178,7 @@ class _ExercisesViewState extends State<ExercisesView> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withAlpha(25),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: color),
       ),

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:matheasy_sn/app/core/routing/app_router.dart';
+import 'package:matheasy_sn/app/di/injector.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Écran pour le téléchargement initial du contenu de l'application.
 class InitialDownloadScreen extends StatefulWidget {
@@ -48,8 +52,13 @@ class _InitialDownloadScreenState extends State<InitialDownloadScreen> {
       _progress = 1.0;
     });
 
-    // TODO: Naviguer vers l'écran d'accueil
-    // context.go(AppRouter.home);
+    // Naviguer vers l'écran d'accueil
+    final prefs = sl<SharedPreferences>();
+    await prefs.setBool('content_downloaded', true);
+
+    if (mounted) {
+      context.go(AppRouter.home);
+    }
   }
 
   @override
@@ -77,14 +86,14 @@ class _InitialDownloadScreenState extends State<InitialDownloadScreen> {
                 'Veuillez patienter pendant le téléchargement du contenu des cours pour une utilisation hors ligne. (Environ 180 Mo)',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.nunito(
-                  color: Colors.white.withOpacity(0.9),
+                  color: Colors.white.withAlpha(230),
                   fontSize: 16,
                 ),
               ),
               const SizedBox(height: 48),
               LinearProgressIndicator(
                 value: _progress,
-                backgroundColor: Colors.white.withOpacity(0.3),
+                backgroundColor: Colors.white.withAlpha(77),
                 valueColor: const AlwaysStoppedAnimation<Color>(Colors.amber),
                 minHeight: 10,
               ),
@@ -92,7 +101,7 @@ class _InitialDownloadScreenState extends State<InitialDownloadScreen> {
               Text(
                 _status,
                 style: GoogleFonts.nunito(
-                  color: Colors.white.withOpacity(0.8),
+                  color: Colors.white.withAlpha(204),
                 ),
               ),
             ],

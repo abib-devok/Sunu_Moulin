@@ -29,7 +29,7 @@ class AppTheme {
       primary: primary,
       secondary: senegaleseOrange,
       error: errorRed,
-      background: backgroundLight,
+      surface: backgroundLight,
     ),
   );
 
@@ -49,7 +49,7 @@ class AppTheme {
       primary: primary,
       secondary: senegaleseOrange,
       error: errorRed,
-      background: backgroundDark,
+      surface: backgroundDark,
     ),
   );
 }

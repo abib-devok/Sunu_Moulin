@@ -167,7 +167,7 @@ On la note `√a`.
             Row(
               children: [
                 CircleAvatar(
-                    backgroundColor: color.withOpacity(0.1),
+                    backgroundColor: color.withAlpha(25),
                     child: Icon(icon, color: color)),
                 const SizedBox(width: 12),
                 Expanded(

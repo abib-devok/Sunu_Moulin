@@ -124,7 +124,7 @@ class CoursesListScreen extends StatelessWidget {
   Widget _buildChapterTile(BuildContext context, Chapter chapter, Color primaryColor) {
     return ListTile(
       leading: CircleAvatar(
-        backgroundColor: primaryColor.withOpacity(0.1),
+        backgroundColor: primaryColor.withAlpha(25),
         child: Icon(chapter.icon, color: primaryColor),
       ),
       title: Text(

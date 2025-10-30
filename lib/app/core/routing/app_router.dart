@@ -12,8 +12,10 @@ import 'package:matheasy_sn/presentation/screens/home/home_screen.dart';
 import 'package:matheasy_sn/presentation/screens/bfem/bfem_quiz_screen.dart';
 import 'package:matheasy_sn/presentation/screens/bfem/pdf_viewer_screen.dart';
 import 'package:matheasy_sn/presentation/screens/progress/progress_screen.dart';
+import 'package:matheasy_sn/app/di/injector.dart';
 import 'package:matheasy_sn/presentation/screens/splash/initial_download_screen.dart';
 import 'package:matheasy_sn/presentation/screens/splash/splash_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Configuration du routeur de l'application.
 ///
@@ -34,6 +36,8 @@ class AppRouter {
   static const String progress = '/progress';
 
   static GoRouter getRouter(BuildContext context) {
+    final sharedPreferences = sl<SharedPreferences>();
+
     return GoRouter(
       initialLocation: splash,
       refreshListenable: GoRouterRefreshStream(context.read<AuthBloc>().stream),
@@ -133,14 +137,16 @@ class AppRouter {
 
         // Si l'utilisateur est authentifié
         if (authState is AuthAuthenticated) {
-            // Simule la vérification du contenu téléchargé
-            final bool isContentDownloaded = false; // TODO: Remplacer par une vraie vérification
+            final isContentDownloaded = sharedPreferences.getBool('content_downloaded') ?? false;
 
             if (!isContentDownloaded) {
-              return initialDownload;
+              // Si on n'est pas déjà sur l'écran de téléchargement, on y va.
+              if (state.uri.toString() != initialDownload) {
+                return initialDownload;
+              }
             }
 
-            // S'il est sur une page d'auth ou le splash, on le redirige vers l'accueil
+            // Si le contenu est téléchargé et qu'on est sur une page non-protégée, on va à l'accueil
             if (isAuthRoute || location == splash || location == initialDownload) {
               return home;
             }

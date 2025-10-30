@@ -72,7 +72,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               "Réussir le BFEM, c'est facile !",
               textAlign: TextAlign.center,
               style: GoogleFonts.lexend(
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withAlpha(230),
                 fontSize: 16,
               ),
             ),
@@ -85,7 +85,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   Container(
                     height: 10,
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withAlpha(51),
                       borderRadius: BorderRadius.circular(5),
                     ),
                     child: ClipRRect(
@@ -101,7 +101,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   Text(
                     'Chargement...',
                     style: GoogleFonts.lexend(
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withAlpha(204),
                       fontSize: 12,
                     ),
                   ),

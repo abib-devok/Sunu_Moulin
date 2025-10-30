@@ -33,6 +33,9 @@ class AuthAuthenticated extends AuthState {
 /// État représentant un utilisateur non authentifié.
 class AuthUnauthenticated extends AuthState {}
 
+/// État indiquant que l'inscription a réussi et que l'utilisateur doit se connecter.
+class AuthRegistrationSuccess extends AuthState {}
+
 /// État d'erreur, contenant un message à afficher à l'utilisateur.
 class AuthError extends AuthState {
   final String message;

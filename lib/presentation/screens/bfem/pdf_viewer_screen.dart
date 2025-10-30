@@ -27,13 +27,8 @@ class PdfViewerScreen extends StatelessWidget {
       ),
       body: SfPdfViewer.file(
         File(filePath),
-        // Affiche une barre de chargement pendant que le PDF est rendu.
-        onDocumentLoadFailed: (details) {
-          // Gérer l'erreur de chargement
-          print(details.description);
-          return const Center(
-            child: Text('Erreur lors du chargement du PDF.'),
-          );
+        onDocumentLoadFailed: (PdfDocumentLoadFailedDetails details) {
+          // Gérer l'erreur, par exemple en affichant un message à l'utilisateur
         },
       ),
     );

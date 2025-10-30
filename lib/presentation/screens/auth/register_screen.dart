@@ -63,11 +63,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ..hideCurrentSnackBar()
               ..showSnackBar(SnackBar(content: Text(state.message)));
           }
-          if (state is AuthUnauthenticated && ModalRoute.of(context)!.isCurrent) {
-            // Après l'inscription, on redirige vers le login
-             ScaffoldMessenger.of(context)
+          if (state is AuthRegistrationSuccess) {
+            ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
-              ..showSnackBar(const SnackBar(content: Text("Inscription réussie ! Veuillez vous connecter.")));
+              ..showSnackBar(const SnackBar(
+                content: Text("Inscription réussie ! Vous pouvez maintenant vous connecter."),
+                backgroundColor: Colors.green,
+              ));
             context.go(AppRouter.login);
           }
         },

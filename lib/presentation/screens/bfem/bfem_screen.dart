@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:matheasy_sn/app/core/routing/app_router.dart';
 
 /// Modèle simple pour représenter une épreuve du BFEM.
 class BfemExam {
@@ -91,7 +90,7 @@ class _BfemScreenState extends State<BfemScreen> {
             ),
             const SizedBox(height: 24),
             if (exam.isDownloaded)
-              _buildDownloadedButtons(context, primaryColor)
+              _buildDownloadedButtons(context, exam, primaryColor)
             else
               _buildDownloadButton(exam, primaryColor),
           ],
@@ -120,7 +119,7 @@ class _BfemScreenState extends State<BfemScreen> {
   }
 
   /// Construit les boutons d'action pour une épreuve déjà téléchargée.
-  Widget _buildDownloadedButtons(BuildContext context, Color primaryColor) {
+  Widget _buildDownloadedButtons(BuildContext context, BfemExam exam, Color primaryColor) {
     return Row(
       children: [
         Expanded(
@@ -131,7 +130,7 @@ class _BfemScreenState extends State<BfemScreen> {
               const fakePdfPath = '/data/user/0/com.example.matheasy_sn/files/bfem_2023.pdf';
               context.goNamed(
                 'pdf-viewer',
-                queryParameters: {'filePath': fakePdfPath, 'title': 'BFEM 2023'},
+                queryParameters: {'filePath': fakePdfPath, 'title': 'BFEM ${exam.year}'},
               );
             },
             icon: const Icon(Icons.picture_as_pdf_outlined),
