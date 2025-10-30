@@ -50,7 +50,13 @@ On la note `√a`.
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: secondaryColor),
-          onPressed: () => context.pop(),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go(AppRouter.courses);
+            }
+          },
         ),
         title: Text(
           'Leçon : Racine carrée',

@@ -222,6 +222,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           obscureText: isPassword && !isPasswordVisible,
           validator: validator,
           autovalidateMode: AutovalidateMode.onUserInteraction,
+          style: GoogleFonts.lexend(color: textPrimaryLightColor),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: GoogleFonts.lexend(color: textSecondaryLightColor),

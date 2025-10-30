@@ -129,7 +129,7 @@ class CoursesListScreen extends StatelessWidget {
       ),
       title: Text(
         chapter.title,
-        style: GoogleFonts.lexend(fontSize: 15, fontWeight: FontWeight.w500),
+        style: GoogleFonts.lexend(fontSize: 15, fontWeight: FontWeight.w500, color: Colors.black87),
       ),
       subtitle: _buildProgressIndicator(),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16),
