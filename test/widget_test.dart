@@ -5,26 +5,42 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:matheasy_sn/main.dart';
+import 'dart:io';
+
+import 'package:hive/hive.dart';
+import 'package:matheasy_sn/app/di/injector.dart' as di;
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  // Initialisation des mocks
+  TestWidgetsFlutterBinding.ensureInitialized();
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  setUp(() async {
+    // Simule SharedPreferences pour les tests
+    SharedPreferences.setMockInitialValues({});
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    // Initialise Hive dans un répertoire temporaire pour les tests
+    final tempDir = await Directory.systemTemp.createTemp();
+    Hive.init(tempDir.path);
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Réinitialise le service locator avant chaque test
+    await di.sl.reset();
+    // Configure les dépendances pour l'environnement de test
+    await di.init();
+  });
+
+  testWidgets('App starts and displays splash screen', (WidgetTester tester) async {
+    // Construit l'application et déclenche un frame.
+    await tester.pumpWidget(const MathEasyApp());
+
+    // Attend que les animations du splash screen se terminent
+    await tester.pumpAndSettle();
+
+    // Vérifie que le SplashScreen est bien affiché au début.
+    // On peut vérifier la présence d'un texte spécifique du splash screen.
+    expect(find.text('MathEasy SN'), findsOneWidget);
   });
 }

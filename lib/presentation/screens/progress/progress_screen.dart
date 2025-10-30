@@ -87,7 +87,7 @@ class ProgressView extends StatelessWidget {
               children: [
                 Text(
                   'Score Global',
-                  style: GoogleFonts.lexend(color: Colors.white.withOpacity(0.8), fontSize: 16),
+                  style: GoogleFonts.lexend(color: Colors.white.withAlpha(204), fontSize: 16),
                 ),
                 Text(
                   '${state.globalScorePercentage.toStringAsFixed(0)}%',

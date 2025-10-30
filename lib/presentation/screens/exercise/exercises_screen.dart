@@ -158,11 +158,11 @@ class _ExercisesViewState extends State<ExercisesView> {
           enabled: !isAnswered,
         );
       case ExerciseType.qcm:
-      // TODO: Implémenter la logique pour les QCM
+        // TODO: Implémenter la logique pour les QCM
+        return const Text('QCM non implémenté');
       case ExerciseType.trueFalse:
-      // TODO: Implémenter la logique pour Vrai/Faux
-      default:
-        return const Text('Type d\'exercice non supporté');
+        // TODO: Implémenter la logique pour Vrai/Faux
+        return const Text('Vrai/Faux non implémenté');
     }
   }
 
@@ -178,7 +178,7 @@ class _ExercisesViewState extends State<ExercisesView> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withAlpha(25),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: color),
       ),

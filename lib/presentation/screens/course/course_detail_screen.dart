@@ -5,9 +5,16 @@ import 'package:go_router/go_router.dart';
 import 'package:matheasy_sn/app/core/routing/app_router.dart';
 
 /// Écran affichant le contenu détaillé d'un cours interactif.
-class CourseDetailScreen extends StatelessWidget {
+class CourseDetailScreen extends StatefulWidget {
   final String slug;
   const CourseDetailScreen({super.key, required this.slug});
+
+  @override
+  State<CourseDetailScreen> createState() => _CourseDetailScreenState();
+}
+
+class _CourseDetailScreenState extends State<CourseDetailScreen> {
+  int? _mcq1Value;
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +82,12 @@ On la note `√a`.
                 1, // Index de la bonne réponse
                 secondaryColor,
                 successColor,
-                primaryColor),
+                primaryColor,
+                _mcq1Value, (value) {
+              setState(() {
+                _mcq1Value = value;
+              });
+            }),
             const SizedBox(height: 80), // Espace pour le bouton flottant
           ],
         ),
@@ -85,7 +97,8 @@ On la note `√a`.
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: ElevatedButton.icon(
           onPressed: () {
-             context.goNamed(AppRouter.exercises, pathParameters: {'chapterSlug': slug});
+            context.goNamed(AppRouter.exercises,
+                pathParameters: {'chapterSlug': widget.slug});
           },
           icon: const Icon(Icons.arrow_forward),
           label: const Text('EXERCICES DU CHAPITRE'),
@@ -132,10 +145,8 @@ On la note `√a`.
                 style: GoogleFonts.nunito(
                     fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
-            _buildObjectiveItem(
-                'Comprendre la définition', successColor),
-            _buildObjectiveItem(
-                'Savoir simplifier une racine', successColor),
+            _buildObjectiveItem('Comprendre la définition', successColor),
+            _buildObjectiveItem('Savoir simplifier une racine', successColor),
           ],
         ),
       ),
@@ -167,7 +178,7 @@ On la note `√a`.
             Row(
               children: [
                 CircleAvatar(
-                    backgroundColor: color.withOpacity(0.1),
+                    backgroundColor: color.withAlpha(25),
                     child: Icon(icon, color: color)),
                 const SizedBox(width: 12),
                 Expanded(
@@ -192,13 +203,20 @@ On la note `√a`.
     );
   }
 
-  Widget _buildMcqCard(String question, List<String> options, int correctIndex,
-      Color secondary, Color success, Color error) {
+  Widget _buildMcqCard(
+      String question,
+      List<String> options,
+      int correctIndex,
+      Color secondary,
+      Color success,
+      Color error,
+      int? groupValue,
+      ValueChanged<int?> onChanged) {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: secondary.withOpacity(0.5), width: 2),
+        side: BorderSide(color: secondary.withAlpha(128), width: 2),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -212,15 +230,17 @@ On la note `√a`.
             ...options.asMap().entries.map((entry) {
               int idx = entry.key;
               String text = entry.value;
-              return RadioListTile<int>(
+              return ListTile(
                 title: Text(text, style: GoogleFonts.nunito()),
-                value: idx,
-                groupValue:
-                    -1, // Simule un état non sélectionné pour la démo
-                onChanged: (int? value) {
-                  // Logique de vérification
-                },
-                activeColor: success,
+                leading: Radio<int>(
+                  value: idx,
+                  // ignore: deprecated_member_use
+                  groupValue: groupValue,
+                  // ignore: deprecated_member_use
+                  onChanged: onChanged,
+                  activeColor: success,
+                ),
+                onTap: () => onChanged(idx),
               );
             }),
           ],

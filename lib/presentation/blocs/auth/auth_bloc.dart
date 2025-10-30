@@ -1,6 +1,10 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:meta/meta.dart';
+import 'package:matheasy_sn/data/datasources/remote/sync_service.dart';
+import 'package:matheasy_sn/domain/usecases/auth/check_auth_status_usecase.dart';
+import 'package:matheasy_sn/domain/usecases/auth/login_usecase.dart';
+import 'package:matheasy_sn/domain/usecases/auth/logout_usecase.dart';
+import 'package:matheasy_sn/domain/usecases/auth/register_usecase.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -53,7 +57,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     try {
       await registerUseCase(event.username, event.password);
-      emit(AuthUnauthenticated()); // L'utilisateur doit se connecter après
+      emit(AuthRegistrationSuccess());
     } catch (e) {
       emit(AuthError(e.toString().replaceFirst('Exception: ', '')));
     }

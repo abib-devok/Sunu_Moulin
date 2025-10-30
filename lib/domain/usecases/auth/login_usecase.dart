@@ -13,7 +13,7 @@ class LoginUseCase {
     await repository.login(username, password);
     if (stayConnected) {
       // Simule la sauvegarde d'un token
-      await repository.saveUserSession(username, 'fake_token_for_${username}');
+      await repository.saveUserSession(username, 'fake_token_for_$username');
     }
   }
 }
