@@ -18,7 +18,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
 
   bool _isPasswordVisible = false;
-  bool _stayConnected = false;
 
   @override
   void dispose() {
@@ -33,7 +32,6 @@ class _LoginScreenState extends State<LoginScreen> {
         AuthLoginRequested(
           username: _usernameController.text,
           password: _passwordController.text,
-          stayConnected: _stayConnected,
         ),
       );
     }
@@ -53,7 +51,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ..hideCurrentSnackBar()
               ..showSnackBar(SnackBar(content: Text(state.message)));
           }
-          // La redirection est gérée par GoRouter, donc pas besoin de naviguer ici
         },
         child: SafeArea(
           child: Stack(
@@ -93,8 +90,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         _buildUsernameField(),
                         const SizedBox(height: 16),
                         _buildPasswordField(),
-                        const SizedBox(height: 16),
-                        _buildStayConnectedCheckbox(),
                         const SizedBox(height: 24),
                         _buildLoginButton(),
                         const SizedBox(height: 16),
@@ -146,23 +141,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildStayConnectedCheckbox() {
-    const Color primaryColor = Color(0xFFE85A24);
-    const Color textColor = Color(0xFF101418);
-    return Row(
-      children: [
-        Checkbox(
-          value: _stayConnected,
-          onChanged: (value) => setState(() => _stayConnected = value ?? false),
-          activeColor: primaryColor,
-          side: const BorderSide(color: Color(0xFFDAE0E7), width: 2),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-        ),
-        Text('Rester connecté', style: GoogleFonts.lexend(color: textColor)),
-      ],
-    );
-  }
-
   Widget _buildLoginButton() {
     const Color primaryColor = Color(0xFFE85A24);
     return BlocBuilder<AuthBloc, AuthState>(
@@ -193,20 +171,14 @@ class _LoginScreenState extends State<LoginScreen> {
           return Column(
             children: [
               Text(
-                state.message, // Affiche le message d'erreur du BLoC
+                state.message,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.lexend(color: errorColor, fontWeight: FontWeight.w500),
               ),
-              // On peut ajouter un autre message si besoin
-              // Text(
-              //   'Connexion impossible. Vous pouvez utiliser le mode hors ligne.',
-              //   textAlign: TextAlign.center,
-              //   style: GoogleFonts.lexend(color: Colors.amber.shade700, fontWeight: FontWeight.w500),
-              // ),
             ],
           );
         }
-        return const SizedBox(height: 24); // Espace réservé pour les erreurs
+        return const SizedBox(height: 24);
       },
     );
   }

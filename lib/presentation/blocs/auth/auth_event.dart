@@ -25,16 +25,14 @@ class AuthRegisterRequested extends AuthEvent {
 class AuthLoginRequested extends AuthEvent {
   final String username;
   final String password;
-  final bool stayConnected;
 
   const AuthLoginRequested({
     required this.username,
     required this.password,
-    required this.stayConnected,
   });
 
   @override
-  List<Object> get props => [username, password, stayConnected];
+  List<Object> get props => [username, password];
 }
 
 /// Événement déclenché lorsque l'utilisateur se déconnecte.
