@@ -8,9 +8,6 @@ abstract class AuthState extends Equatable {
   List<Object?> get props => [];
 }
 
-/// État initial, avant toute action d'authentification.
-class AuthInitial extends AuthState {}
-
 /// État de chargement, affiché pendant les opérations réseau (connexion, inscription).
 class AuthLoading extends AuthState {}
 

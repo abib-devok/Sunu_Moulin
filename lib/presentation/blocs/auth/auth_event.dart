@@ -37,6 +37,3 @@ class AuthLoginRequested extends AuthEvent {
 
 /// Événement déclenché lorsque l'utilisateur se déconnecte.
 class AuthLogoutRequested extends AuthEvent {}
-
-/// Événement déclenché au démarrage de l'application pour vérifier l'état de connexion.
-class AuthStatusChecked extends AuthEvent {}
