@@ -5,17 +5,27 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:matheasy_sn/main.dart';
+import 'dart:io';
+
+import 'package:hive/hive.dart';
 import 'package:matheasy_sn/app/di/injector.dart' as di;
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   // Initialisation des mocks
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUp(() async {
+    // Simule SharedPreferences pour les tests
+    SharedPreferences.setMockInitialValues({});
+
+    // Initialise Hive dans un répertoire temporaire pour les tests
+    final tempDir = await Directory.systemTemp.createTemp();
+    Hive.init(tempDir.path);
+
     // Réinitialise le service locator avant chaque test
     await di.sl.reset();
     // Configure les dépendances pour l'environnement de test

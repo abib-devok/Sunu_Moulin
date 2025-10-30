@@ -23,15 +23,15 @@ class SyncService {
       }
 
       // Étape 3: Préparer les données pour l'envoi
-      final List<Map<String, dynamic>> payload = localProgress.map((progress) {
-        return {
-          'entity_id': progress.entityId,
-          'score': progress.score,
-          'total': progress.total,
-          'created_at': progress.date.toIso8601String(),
-          // 'user_id' serait nécessaire dans une vraie application
-        };
-      }).toList();
+      // final List<Map<String, dynamic>> payload = localProgress.map((progress) {
+      //   return {
+      //     'entity_id': progress.entityId,
+      //     'score': progress.score,
+      //     'total': progress.total,
+      //     'created_at': progress.date.toIso8601String(),
+      //     // 'user_id' serait nécessaire dans une vraie application
+      //   };
+      // }).toList();
 
       // Étape 4: Envoyer les données à Supabase
       try {
