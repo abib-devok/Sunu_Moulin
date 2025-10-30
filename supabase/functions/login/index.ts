@@ -49,13 +49,19 @@ serve(async (req) => {
       .single();
 
     if (findError || !user) {
-      throw new Error("Identifiants incorrects.");
+      return new Response(JSON.stringify({ error: "Identifiants incorrects." }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 401, // Unauthorized
+      })
     }
 
     // Vérifie le mot de passe
     const passwordMatch = await bcrypt.compare(password, user.password_hash);
     if (!passwordMatch) {
-      throw new Error("Identifiants incorrects.");
+      return new Response(JSON.stringify({ error: "Identifiants incorrects." }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 401, // Unauthorized
+      })
     }
 
     // Génère le token JWT
@@ -77,9 +83,9 @@ serve(async (req) => {
     })
 
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: `Erreur interne (login): ${error.message}` }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 400,
+      status: 500,
     })
   }
 })
