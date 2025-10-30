@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:matheasy_sn/data/datasources/remote/sync_service.dart';
@@ -73,7 +75,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
      emit(AuthLoading());
     try {
-      final user = await checkAuthStatusUseCase();
+      // Ajout d'un timeout pour éviter le blocage
+      final user = await checkAuthStatusUseCase().timeout(
+        const Duration(seconds: 4),
+        onTimeout: () => null, // Si ça prend trop de temps, on considère l'utilisateur comme déconnecté
+      );
+
       if (user != null) {
         emit(AuthAuthenticated(user));
         syncService.syncProgress(user.id);
