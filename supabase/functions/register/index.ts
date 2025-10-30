@@ -1,7 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.44.2'
-// Utilisation d'une librairie de hachage compatible avec Deno Edge Functions
-import { hash, genSalt } from "https://deno.land/x/bcryptjs@v2.4.3/mod.ts";
+// Importation depuis un CDN fiable (esm.sh) pour résoudre le "Module not found"
+import { hash, genSalt } from "https://esm.sh/bcryptjs@2.4.3";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -34,7 +34,7 @@ serve(async (req) => {
       .eq('username', username)
       .single();
 
-    if (findError && findError.code !== 'PGRST116') {
+    if (findError && findError.code !== 'PGRST116') { // PGRST116 = 'not found'
         throw findError;
     }
 
@@ -45,6 +45,8 @@ serve(async (req) => {
       })
     }
 
+    // `genSalt` de bcryptjs est synchrone dans la plupart des implémentations JS,
+    // mais ici on garde le `await` par bonne pratique si l'implémentation Deno est asynchrone.
     const salt = await genSalt(10);
     const password_hash = await hash(password, salt);
 
