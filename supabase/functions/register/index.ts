@@ -1,7 +1,7 @@
-// --- DÉBUT DU CODE POUR LA FONCTION "register" ---
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.44.2'
-import * as bcrypt from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
+// Utilisation d'une librairie de hachage compatible avec Deno Edge Functions
+import { hash, genSalt } from "https://deno.land/x/bcryptjs@v2.4.3/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -34,19 +34,19 @@ serve(async (req) => {
       .eq('username', username)
       .single();
 
-    if (findError && findError.code !== 'PGRST116') { // PGRST116 = 'not found'
+    if (findError && findError.code !== 'PGRST116') {
         throw findError;
     }
 
     if (existingUser) {
       return new Response(JSON.stringify({ error: "Ce nom d'utilisateur est déjà pris." }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 409, // Conflict
+        status: 409,
       })
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const password_hash = await bcrypt.hash(password, salt);
+    const salt = await genSalt(10);
+    const password_hash = await hash(password, salt);
 
     const { error: insertError } = await supabaseAdmin
       .from('users')
@@ -58,7 +58,7 @@ serve(async (req) => {
 
     return new Response(JSON.stringify({ message: 'Utilisateur créé avec succès.' }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 201, // Created
+      status: 201,
     })
 
   } catch (error) {
@@ -68,4 +68,3 @@ serve(async (req) => {
     })
   }
 })
-// --- FIN DU CODE POUR LA FONCTION "register" ---
