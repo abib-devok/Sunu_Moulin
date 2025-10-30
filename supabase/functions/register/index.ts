@@ -71,9 +71,9 @@ serve(async (req) => {
 
   } catch (error) {
     // Gère les erreurs
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: `Erreur interne (register): ${error.message}` }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 400,
+      status: 500,
     })
   }
 })
