@@ -26,11 +26,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required this.logoutUseCase,
     required this.checkAuthStatusUseCase,
     required this.syncService,
-  }) : super(AuthInitial()) {
+  }) : super(AuthUnauthenticated()) { // Démarre directement en état déconnecté
     on<AuthLoginRequested>(_onLoginRequested);
     on<AuthRegisterRequested>(_onRegisterRequested);
     on<AuthLogoutRequested>(_onLogoutRequested);
-    on<AuthStatusChecked>(_onAuthStatusChecked);
   }
 
   Future<void> _onLoginRequested(
@@ -67,28 +66,5 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     await logoutUseCase();
     emit(AuthUnauthenticated());
-  }
-
-  Future<void> _onAuthStatusChecked(
-    AuthStatusChecked event,
-    Emitter<AuthState> emit,
-  ) async {
-     emit(AuthLoading());
-    try {
-      // Ajout d'un timeout pour éviter le blocage
-      final user = await checkAuthStatusUseCase().timeout(
-        const Duration(seconds: 4),
-        onTimeout: () => null, // Si ça prend trop de temps, on considère l'utilisateur comme déconnecté
-      );
-
-      if (user != null) {
-        emit(AuthAuthenticated(user));
-        syncService.syncProgress(user.id);
-      } else {
-        emit(AuthUnauthenticated());
-      }
-    } catch (_) {
-       emit(AuthUnauthenticated());
-    }
   }
 }

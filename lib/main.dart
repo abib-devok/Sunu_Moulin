@@ -24,7 +24,7 @@ class MathEasyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     // Fournit le AuthBloc à l'ensemble de l'application en utilisant GetIt.
     return BlocProvider(
-      create: (context) => di.sl<AuthBloc>()..add(AuthStatusChecked()),
+      create: (context) => di.sl<AuthBloc>(),
       child: Builder(
         builder: (context) {
           return MaterialApp.router(

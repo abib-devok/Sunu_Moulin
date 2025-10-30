@@ -61,28 +61,39 @@ class AppRouter {
         final authState = context.read<AuthBloc>().state;
         final location = state.uri.toString();
 
-        final publicRoutes = [login, register, splash];
+        final publicRoutes = [login, register];
 
-        if (authState is AuthInitial || authState is AuthLoading) {
-          return splash;
+        // Si l'application est en cours de chargement (par exemple, lors d'une tentative de connexion), on affiche le splash screen.
+        if (authState is AuthLoading) {
+            return splash;
         }
 
+        // Si l'utilisateur n'est pas authentifié
         if (authState is AuthUnauthenticated || authState is AuthRegistrationSuccess) {
-          return publicRoutes.contains(location) ? null : login;
+            // S'il est déjà sur une page publique (login/register), on ne fait rien.
+            if (publicRoutes.contains(location)) {
+                return null;
+            }
+            // Sinon, on le redirige vers le login.
+            return login;
         }
 
+        // Si l'utilisateur est authentifié
         if (authState is AuthAuthenticated) {
           final isContentDownloaded = sharedPreferences.getBool('content_downloaded') ?? false;
 
           if (!isContentDownloaded) {
+            // S'il n'a pas téléchargé le contenu, on le force à aller sur l'écran de téléchargement.
             return location == initialDownload ? null : initialDownload;
           }
 
-          if (publicRoutes.contains(location) || location == initialDownload) {
+          // Si le contenu est téléchargé et qu'il est sur une page publique ou de téléchargement, on le redirige vers l'accueil.
+          if (publicRoutes.contains(location) || location == initialDownload || location == splash) {
             return home;
           }
         }
 
+        // Dans tous les autres cas (y compris l'état initial qui est maintenant géré par le délai du splash), on ne redirige pas.
         return null;
       },
       errorBuilder: (context, state) => Scaffold(body: Center(child: Text('Page non trouvée: ${state.error}'))),
