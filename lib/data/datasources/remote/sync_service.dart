@@ -12,7 +12,7 @@ class SyncService {
   });
 
   /// Tente de synchroniser les données de progression non synchronisées.
-  Future<void> syncProgress() async {
+  Future<void> syncProgress(String userId) async {
     // Étape 1: Vérifier la connexion Internet (simulé pour l'instant)
     const bool isConnected = true; // TODO: Remplacer par une vraie vérification de connectivité
     if (isConnected) {
@@ -25,11 +25,11 @@ class SyncService {
       // Étape 3: Préparer les données pour l'envoi
       // final List<Map<String, dynamic>> payload = localProgress.map((progress) {
       //   return {
+      //     'user_id': userId,
       //     'entity_id': progress.entityId,
       //     'score': progress.score,
       //     'total': progress.total,
       //     'created_at': progress.date.toIso8601String(),
-      //     // 'user_id' serait nécessaire dans une vraie application
       //   };
       // }).toList();
 

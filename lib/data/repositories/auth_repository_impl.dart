@@ -1,11 +1,9 @@
 import 'package:matheasy_sn/data/datasources/local/auth_local_data_source.dart';
 import 'package:matheasy_sn/data/datasources/remote/auth_remote_data_source.dart';
+import 'package:matheasy_sn/domain/entities/user.dart';
 import 'package:matheasy_sn/domain/repositories/auth_repository.dart';
 
 /// Implémentation du contrat `AuthRepository`.
-///
-/// Cette classe orchestre les sources de données locales et distantes
-/// pour exécuter les opérations d'authentification.
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
   final AuthLocalDataSource localDataSource;
@@ -16,21 +14,17 @@ class AuthRepositoryImpl implements AuthRepository {
   });
 
   @override
-  Future<void> login(String username, String password) async {
-    // Pour le moment, on simule un appel distant.
-    // Plus tard, on appellera la vraie fonction Supabase.
-    // await remoteDataSource.login(username, password);
-    if (username != 'test' || password != 'password') {
-      throw Exception("Identifiants incorrects");
+  Future<User> login(String username, String password) async {
+    final userModel = await remoteDataSource.login(username, password);
+    if (userModel.token != null) {
+      await localDataSource.saveToken(userModel.token!);
     }
+    return User(id: userModel.id, username: userModel.username);
   }
 
   @override
   Future<void> register(String username, String password) async {
-    // await remoteDataSource.register(username, password);
-    if (username == 'test') {
-      throw Exception("Ce nom d'utilisateur est déjà pris.");
-    }
+    await remoteDataSource.register(username, password);
   }
 
   @override
@@ -39,16 +33,19 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> checkAuthStatus() async {
+  Future<User?> checkAuthStatus() async {
     final token = await localDataSource.getToken();
     if (token == null) {
-      throw Exception('Not authenticated');
+      return null;
     }
+    // Dans une vraie application, on décoderait le token pour récupérer l'ID et le nom d'utilisateur.
+    // Pour l'instant, on simule un utilisateur si un token existe.
+    return const User(id: 'fake_id_from_token', username: 'Utilisateur');
   }
 
   @override
-  Future<void> saveUserSession(String username, String token) async {
-    await localDataSource.saveToken(token);
+  Future<void> saveUserSession(String token) async {
+     await localDataSource.saveToken(token);
   }
 
   @override

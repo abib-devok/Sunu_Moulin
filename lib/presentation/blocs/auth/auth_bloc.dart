@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:matheasy_sn/data/datasources/remote/sync_service.dart';
+import 'package:matheasy_sn/domain/entities/user.dart';
 import 'package:matheasy_sn/domain/usecases/auth/check_auth_status_usecase.dart';
 import 'package:matheasy_sn/domain/usecases/auth/login_usecase.dart';
 import 'package:matheasy_sn/domain/usecases/auth/logout_usecase.dart';
@@ -10,9 +11,6 @@ part 'auth_event.dart';
 part 'auth_state.dart';
 
 /// BLoC pour la gestion de l'authentification.
-///
-/// Gère la logique métier liée à l'inscription, la connexion, la déconnexion
-/// et la vérification de l'état d'authentification de l'utilisateur.
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LoginUseCase loginUseCase;
   final RegisterUseCase registerUseCase;
@@ -33,23 +31,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthStatusChecked>(_onAuthStatusChecked);
   }
 
-  /// Gère la demande de connexion.
   Future<void> _onLoginRequested(
     AuthLoginRequested event,
     Emitter<AuthState> emit,
   ) async {
     emit(AuthLoading());
     try {
-      await loginUseCase(event.username, event.password, event.stayConnected);
-      emit(AuthAuthenticated(Object())); // Simule un utilisateur
-      // Tente la synchronisation après la connexion
-      syncService.syncProgress();
+      final user = await loginUseCase(event.username, event.password);
+      emit(AuthAuthenticated(user));
+      syncService.syncProgress(user.id);
     } catch (e) {
       emit(AuthError(e.toString().replaceFirst('Exception: ', '')));
     }
   }
 
-  /// Gère la demande d'inscription.
   Future<void> _onRegisterRequested(
     AuthRegisterRequested event,
     Emitter<AuthState> emit,
@@ -63,7 +58,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  /// Gère la demande de déconnexion.
   Future<void> _onLogoutRequested(
     AuthLogoutRequested event,
     Emitter<AuthState> emit,
@@ -73,17 +67,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthUnauthenticated());
   }
 
-  /// Vérifie si un utilisateur est déjà connecté au démarrage.
   Future<void> _onAuthStatusChecked(
     AuthStatusChecked event,
     Emitter<AuthState> emit,
   ) async {
      emit(AuthLoading());
     try {
-      await checkAuthStatusUseCase();
-      emit(AuthAuthenticated(Object())); // Simule un utilisateur connecté
-      // Tente la synchronisation au démarrage si déjà connecté
-      syncService.syncProgress();
+      final user = await checkAuthStatusUseCase();
+      if (user != null) {
+        emit(AuthAuthenticated(user));
+        syncService.syncProgress(user.id);
+      } else {
+        emit(AuthUnauthenticated());
+      }
     } catch (_) {
        emit(AuthUnauthenticated());
     }

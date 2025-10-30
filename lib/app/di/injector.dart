@@ -13,6 +13,9 @@ import 'package:matheasy_sn/data/repositories/progress_repository_impl.dart';
 import 'package:matheasy_sn/domain/entities/user_progress.dart';
 import 'package:matheasy_sn/domain/repositories/auth_repository.dart';
 import 'package:matheasy_sn/domain/repositories/exercise_repository.dart';
+import 'package:matheasy_sn/data/models/chapter_model.dart';
+import 'package:matheasy_sn/data/repositories/content_repository_impl.dart';
+import 'package:matheasy_sn/domain/repositories/content_repository.dart';
 import 'package:matheasy_sn/domain/repositories/progress_repository.dart';
 import 'package:matheasy_sn/domain/usecases/auth/check_auth_status_usecase.dart';
 import 'package:matheasy_sn/domain/usecases/auth/login_usecase.dart';
@@ -22,6 +25,7 @@ import 'package:matheasy_sn/domain/usecases/exercise/get_exercises_usecase.dart'
 import 'package:matheasy_sn/domain/usecases/progress/get_progress_usecase.dart';
 import 'package:matheasy_sn/domain/usecases/progress/save_progress_usecase.dart';
 import 'package:matheasy_sn/presentation/blocs/auth/auth_bloc.dart';
+import 'package:matheasy_sn/presentation/blocs/content/content_bloc.dart';
 import 'package:matheasy_sn/presentation/blocs/exercise/exercise_bloc.dart';
 import 'package:matheasy_sn/presentation/blocs/progress/progress_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -46,6 +50,7 @@ Future<void> init() async {
         getProgressUseCase: sl(),
         saveProgressUseCase: sl(),
       ));
+  sl.registerFactory(() => ContentBloc(contentRepository: sl()));
 
   //============================================================================
   // USE CASES
@@ -69,6 +74,11 @@ Future<void> init() async {
       () => ExerciseRepositoryImpl(databaseService: sl()));
   sl.registerLazySingleton<ProgressRepository>(
       () => ProgressRepositoryImpl(progressBox: sl()));
+  sl.registerLazySingleton<ContentRepository>(() => ContentRepositoryImpl(
+        supabaseClient: sl(),
+        databaseService: sl(),
+        chaptersBox: sl(),
+      ));
 
   //============================================================================
   // DATA SOURCES
@@ -101,6 +111,9 @@ Future<void> init() async {
 
   final progressBox = await Hive.openBox<UserProgress>('user_progress');
   sl.registerLazySingleton<Box<UserProgress>>(() => progressBox);
+
+  final chaptersBox = await Hive.openBox<ChapterModel>('chapters');
+  sl.registerLazySingleton<Box<ChapterModel>>(() => chaptersBox);
 
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);

@@ -1,14 +1,11 @@
 part of 'auth_bloc.dart';
 
 /// Classe de base pour les états de l'authentification.
-///
-/// Utilise `Equatable` pour faciliter les comparaisons dans le BLoC
-/// et éviter les reconstructions inutiles de l'UI.
 abstract class AuthState extends Equatable {
   const AuthState();
 
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
 /// État initial, avant toute action d'authentification.
@@ -18,11 +15,8 @@ class AuthInitial extends AuthState {}
 class AuthLoading extends AuthState {}
 
 /// État représentant un utilisateur authentifié avec succès.
-///
-/// Contient l'entité `User` qui peut être utilisée dans l'UI.
 class AuthAuthenticated extends AuthState {
-  // TODO: Remplacer `Object` par une véritable entité `User`
-  final Object user;
+  final User user;
 
   const AuthAuthenticated(this.user);
 
