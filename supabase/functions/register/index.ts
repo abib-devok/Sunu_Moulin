@@ -1,14 +1,13 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.44.2'
-// Importation depuis un CDN fiable (esm.sh) pour résoudre le "Module not found"
-import { hash, genSalt } from "https://esm.sh/bcryptjs@2.4.3";
+import { createClient } from 'npm:@supabase/supabase-js@2'
+import * as bcrypt from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
+  // Gère les requêtes OPTIONS pour CORS
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -16,11 +15,11 @@ serve(async (req) => {
   try {
     const { username, password } = await req.json()
     if (!username || !password) {
-      throw new Error("Nom d'utilisateur ou mot de passe manquant.");
+      throw new Error("Nom d'utilisateur ou mot de passe manquant.")
     }
 
     if (password.length < 6) {
-      throw new Error("Le mot de passe doit contenir au moins 6 caractères.");
+      throw new Error("Le mot de passe doit contenir au moins 6 caractères.")
     }
 
     const supabaseAdmin = createClient(
@@ -35,7 +34,7 @@ serve(async (req) => {
       .single();
 
     if (findError && findError.code !== 'PGRST116') { // PGRST116 = 'not found'
-        throw findError;
+      throw findError;
     }
 
     if (existingUser) {
@@ -45,10 +44,8 @@ serve(async (req) => {
       })
     }
 
-    // `genSalt` de bcryptjs est synchrone dans la plupart des implémentations JS,
-    // mais ici on garde le `await` par bonne pratique si l'implémentation Deno est asynchrone.
-    const salt = await genSalt(10);
-    const password_hash = await hash(password, salt);
+    // Hachage synchrone avec bcrypt pour éviter les Workers
+    const password_hash = bcrypt.hashSync(password);
 
     const { error: insertError } = await supabaseAdmin
       .from('users')
@@ -70,3 +67,5 @@ serve(async (req) => {
     })
   }
 })
+
+console.log("Fonction d'inscription prête !")
