@@ -1,7 +1,5 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.44.2'
-// Importation depuis un CDN fiable (esm.sh) pour résoudre le "Module not found"
-import { compare } from "https://esm.sh/bcryptjs@2.4.3";
+import { createClient } from 'npm:@supabase/supabase-js@2'
+import * as bcrypt from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
 import { create } from "https://deno.land/x/djwt@v3.0.2/mod.ts";
 
 const corsHeaders = {
@@ -26,7 +24,7 @@ async function generateJWT(userId: string, userRole: string, secret: string) {
     }, key);
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -34,7 +32,7 @@ serve(async (req) => {
   try {
     const { username, password } = await req.json()
     if (!username || !password) {
-      throw new Error("Nom d'utilisateur ou mot de passe manquant.");
+      throw new Error("Nom d'utilisateur ou mot de passe manquant.")
     }
 
     const supabaseAdmin = createClient(
@@ -45,7 +43,7 @@ serve(async (req) => {
     // Trouve l'utilisateur
     const { data: user, error: findError } = await supabaseAdmin
       .from('users')
-      .select('id, password_hash')
+      .select('id, password_hash, username')
       .eq('username', username)
       .single();
 
@@ -56,8 +54,8 @@ serve(async (req) => {
       })
     }
 
-    // `compare` de bcryptjs est asynchrone
-    const passwordMatch = await compare(password, user.password_hash);
+    // Comparaison synchrone avec bcrypt (même lib que pour l'inscription)
+    const passwordMatch = bcrypt.compareSync(password, user.password_hash);
     if (!passwordMatch) {
       return new Response(JSON.stringify({ error: "Identifiants incorrects." }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -77,7 +75,7 @@ serve(async (req) => {
     return new Response(JSON.stringify({
         message: 'Connexion réussie.',
         token: token,
-        user: { id: user.id, username: username }
+        user: { id: user.id, username: user.username }
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
@@ -90,3 +88,5 @@ serve(async (req) => {
     })
   }
 })
+
+console.log("Fonction de login prête !")
