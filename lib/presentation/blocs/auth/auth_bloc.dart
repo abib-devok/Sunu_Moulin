@@ -63,7 +63,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthLogoutRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(AuthLoading());
+    // Ne passe plus par l'état de chargement, ce qui évite le blocage.
     await logoutUseCase();
     emit(AuthUnauthenticated());
   }
