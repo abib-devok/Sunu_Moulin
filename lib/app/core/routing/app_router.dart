@@ -12,6 +12,7 @@ import 'package:matheasy_sn/presentation/screens/home/home_screen.dart';
 import 'package:matheasy_sn/presentation/screens/bfem/bfem_quiz_screen.dart';
 import 'package:matheasy_sn/presentation/screens/bfem/pdf_viewer_screen.dart';
 import 'package:matheasy_sn/presentation/screens/progress/progress_screen.dart';
+import 'package:matheasy_sn/presentation/screens/splash/initial_download_screen.dart';
 import 'package:matheasy_sn/presentation/screens/splash/splash_screen.dart';
 
 /// Configuration du routeur de l'application.
@@ -23,6 +24,7 @@ class AppRouter {
   static const String splash = '/';
   static const String login = '/login';
   static const String register = '/register';
+  static const String initialDownload = '/initial-download';
   static const String home = '/home';
   static const String courses = '/courses';
   static const String courseDetail = '/course-detail';
@@ -51,6 +53,11 @@ class AppRouter {
           name: register,
           builder: (context, state) => const RegisterScreen(),
         ),
+       GoRoute(
+        path: initialDownload,
+        name: initialDownload,
+        builder: (context, state) => const InitialDownloadScreen(),
+      ),
         GoRoute(
           path: home,
           name: home,
@@ -126,8 +133,17 @@ class AppRouter {
 
         // Si l'utilisateur est authentifié
         if (authState is AuthAuthenticated) {
+            // Simule la vérification du contenu téléchargé
+            final bool isContentDownloaded = false; // TODO: Remplacer par une vraie vérification
+
+            if (!isContentDownloaded) {
+              return initialDownload;
+            }
+
             // S'il est sur une page d'auth ou le splash, on le redirige vers l'accueil
-            return isAuthRoute || location == splash ? home : null;
+            if (isAuthRoute || location == splash || location == initialDownload) {
+              return home;
+            }
         }
 
         return null; // Pas de redirection

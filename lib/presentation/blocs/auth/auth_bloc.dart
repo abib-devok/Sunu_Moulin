@@ -14,12 +14,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final RegisterUseCase registerUseCase;
   final LogoutUseCase logoutUseCase;
   final CheckAuthStatusUseCase checkAuthStatusUseCase;
+  final SyncService syncService;
 
   AuthBloc({
     required this.loginUseCase,
     required this.registerUseCase,
     required this.logoutUseCase,
     required this.checkAuthStatusUseCase,
+    required this.syncService,
   }) : super(AuthInitial()) {
     on<AuthLoginRequested>(_onLoginRequested);
     on<AuthRegisterRequested>(_onRegisterRequested);
@@ -36,6 +38,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       await loginUseCase(event.username, event.password, event.stayConnected);
       emit(AuthAuthenticated(Object())); // Simule un utilisateur
+      // Tente la synchronisation après la connexion
+      syncService.syncProgress();
     } catch (e) {
       emit(AuthError(e.toString().replaceFirst('Exception: ', '')));
     }
@@ -74,6 +78,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       await checkAuthStatusUseCase();
       emit(AuthAuthenticated(Object())); // Simule un utilisateur connecté
+      // Tente la synchronisation au démarrage si déjà connecté
+      syncService.syncProgress();
     } catch (_) {
        emit(AuthUnauthenticated());
     }
