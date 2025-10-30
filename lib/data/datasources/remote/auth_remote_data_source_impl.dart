@@ -29,8 +29,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         token: token,
       );
     } catch (e) {
-      // Gérer les erreurs réseau ou autres exceptions
-      throw Exception('Impossible de contacter le serveur de connexion.');
+      // Affiche l'erreur détaillée pour aider au débogage.
+      print('--- ERREUR LORS DE LA CONNEXION ---');
+      print(e);
+      print('------------------------------------');
+      throw Exception('Impossible de contacter le serveur de connexion. Vérifiez les logs de la fonction Supabase.');
     }
   }
 
@@ -46,8 +49,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         throw Exception(response.data['error'] ?? 'Erreur d\'inscription inconnue');
       }
     } catch (e) {
-      // Gérer les erreurs réseau ou autres exceptions
-      throw Exception('Impossible de contacter le serveur d\'inscription.');
+      // Affiche l'erreur détaillée pour aider au débogage.
+      print('--- ERREUR LORS DE L\'INSCRIPTION ---');
+      print(e);
+      print('-------------------------------------');
+      throw Exception('Impossible de contacter le serveur d\'inscription. Vérifiez les logs de la fonction Supabase.');
     }
   }
 }
