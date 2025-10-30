@@ -230,12 +230,17 @@ On la note `√a`.
             ...options.asMap().entries.map((entry) {
               int idx = entry.key;
               String text = entry.value;
-              return RadioListTile<int>(
+              return ListTile(
                 title: Text(text, style: GoogleFonts.nunito()),
-                value: idx,
-                groupValue: groupValue,
-                onChanged: onChanged,
-                activeColor: success,
+                leading: Radio<int>(
+                  value: idx,
+                  // ignore: deprecated_member_use
+                  groupValue: groupValue,
+                  // ignore: deprecated_member_use
+                  onChanged: onChanged,
+                  activeColor: success,
+                ),
+                onTap: () => onChanged(idx),
               );
             }),
           ],
