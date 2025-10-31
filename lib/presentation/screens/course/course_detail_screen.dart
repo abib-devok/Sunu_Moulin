@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
-import 'package:matheasy_sn/app/core/routing/app_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:matheasy_sn/data/datasources/courses/chapter_1_content.dart';
+import 'package:matheasy_sn/domain/entities/course_content/course_content.dart';
+import 'package:matheasy_sn/presentation/screens/course/widgets/a_retenir_widget.dart';
+import 'package:matheasy_sn/presentation/screens/course/widgets/example_widget.dart';
+import 'package:matheasy_sn/presentation/screens/course/widgets/math_formula_widget.dart';
+import 'package:matheasy_sn/presentation/screens/course/widgets/mcq_widget.dart';
+import 'package:matheasy_sn/presentation/screens/course/widgets/paragraph_widget.dart';
+import 'package:matheasy_sn/presentation/screens/course/widgets/title_widget.dart';
 
 /// Écran affichant le contenu détaillé d'un cours interactif.
 class CourseDetailScreen extends StatefulWidget {
@@ -14,34 +20,19 @@ class CourseDetailScreen extends StatefulWidget {
 }
 
 class _CourseDetailScreenState extends State<CourseDetailScreen> {
-  int? _mcq1Value;
+  // Map pour stocker la réponse de chaque QCM.
+  // La clé est l'index du QCM dans la liste de contenu.
+  final Map<int, int?> _mcqAnswers = {};
 
   @override
   Widget build(BuildContext context) {
-    // Couleurs basées sur la maquette "Screen 4"
+    // Couleurs
     const Color primaryColor = Color(0xFFE53935);
     const Color secondaryColor = Color(0xFF1E88E5);
     const Color backgroundColor = Color(0xFFF5F5F5);
     const Color textColor = Color(0xFF212121);
-    const Color successColor = Color(0xFF4CAF50);
 
-    // Contenu Markdown factice pour la leçon
-    const String markdownContent = """
-## 1️⃣ Définition
-La **racine carrée** d'un nombre `a` est le nombre positif qui, une fois multiplié par lui-même, donne `a`.
-On la note `√a`.
-
-*Exemple :* `√16 = 4` car `4 x 4 = 16`.
-
-## 2️⃣ Propriétés importantes
-- `√(a²)` = a (si a est positif)
-- `√a * √b = √(a*b)`
-- `√a / √b = √(a/b)`
-
-## 3️⃣ Résumé
-- `√0 = 0`
-- `√1 = 1`
-""";
+    final courseContent = Chapter1Content.content;
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -54,14 +45,15 @@ On la note `√a`.
             if (context.canPop()) {
               context.pop();
             } else {
-              context.go(AppRouter.courses);
+              // Note: Assurez-vous que la route '/courses' est bien définie dans votre router.
+              context.go('/courses');
             }
           },
         ),
         title: Text(
-          'Leçon : Racine carrée',
+          Chapter1Content.title,
           style: GoogleFonts.nunito(
-              color: textColor, fontWeight: FontWeight.bold, fontSize: 18),
+              color: textColor, fontWeight: FontWeight.bold, fontSize: 16),
         ),
         centerTitle: true,
         actions: [
@@ -69,42 +61,24 @@ On la note `√a`.
           const SizedBox(width: 16),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildObjectivesCard(successColor),
-            const SizedBox(height: 16),
-            _buildContentCard(
-                "Qu'est-ce qu'une racine carrée ?",
-                Icons.square_foot,
-                secondaryColor,
-                markdownContent),
-            const SizedBox(height: 16),
-            _buildMcqCard(
-                "Question 1 : Quelle est la racine carrée de 25 ?",
-                ["4", "5", "6"],
-                1, // Index de la bonne réponse
-                secondaryColor,
-                successColor,
-                primaryColor,
-                _mcq1Value, (value) {
-              setState(() {
-                _mcq1Value = value;
-              });
-            }),
-            const SizedBox(height: 80), // Espace pour le bouton flottant
-          ],
-        ),
+      body: ListView.builder(
+        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 80.0), // Espace pour le bouton
+        itemCount: courseContent.length,
+        itemBuilder: (context, index) {
+          final contentItem = courseContent[index];
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: _buildContentItem(contentItem, index),
+          );
+        },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: ElevatedButton.icon(
           onPressed: () {
-            context.goNamed(AppRouter.exercises,
-                pathParameters: {'chapterSlug': widget.slug});
+            // Note: Assurez-vous que la route nommée 'exercises' est bien définie.
+            // context.goNamed('exercises', pathParameters: {'chapterSlug': widget.slug});
           },
           icon: const Icon(Icons.arrow_forward),
           label: const Text('EXERCICES DU CHAPITRE'),
@@ -125,131 +99,43 @@ On la note `√a`.
     );
   }
 
+  Widget _buildContentItem(CourseContent contentItem, int index) {
+    if (contentItem is TitleContent) {
+      return TitleWidget(content: contentItem);
+    } else if (contentItem is ParagraphContent) {
+      return ParagraphWidget(content: contentItem);
+    } else if (contentItem is MathFormulaContent) {
+      return MathFormulaWidget(content: contentItem);
+    } else if (contentItem is ARetenirContent) {
+      return ARetenirWidget(content: contentItem, buildContentItem: _buildContentItem);
+    } else if (contentItem is ExampleContent) {
+      return ExampleWidget(content: contentItem, buildContentItem: _buildContentItem);
+    } else if (contentItem is McqContent) {
+      return McqWidget(
+        content: contentItem,
+        contentIndex: index,
+        groupValue: _mcqAnswers[index],
+        onAnswerChanged: (contentIndex, value) {
+          setState(() {
+            _mcqAnswers[contentIndex] = value;
+          });
+        },
+      );
+    }
+    return const SizedBox.shrink();
+  }
+
   Widget _buildCircularProgress() {
-    return const SizedBox(
-      width: 32,
-      height: 32,
-      child: CircularProgressIndicator(
-        value: 0.2, // 20% de progression
-        strokeWidth: 3,
-        backgroundColor: Colors.grey,
-        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1E88E5)),
-      ),
-    );
-  }
-
-  Widget _buildObjectivesCard(Color successColor) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Objectifs d\'apprentissage',
-                style: GoogleFonts.nunito(
-                    fontSize: 20, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            _buildObjectiveItem('Comprendre la définition', successColor),
-            _buildObjectiveItem('Savoir simplifier une racine', successColor),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildObjectiveItem(String text, Color color) {
-    return Row(
-      children: [
-        Icon(Icons.check_circle, color: color, size: 20),
-        const SizedBox(width: 8),
-        Expanded(
-            child: Text(text,
-                style: GoogleFonts.nunito(fontSize: 16))),
-      ],
-    );
-  }
-
-  Widget _buildContentCard(
-      String title, IconData icon, Color color, String content) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                CircleAvatar(
-                    backgroundColor: color.withAlpha(25),
-                    child: Icon(icon, color: color)),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(title,
-                      style: GoogleFonts.nunito(
-                          fontSize: 18, fontWeight: FontWeight.bold)),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            MarkdownBody(
-              data: content,
-              styleSheet: MarkdownStyleSheet.fromTheme(ThemeData(
-                textTheme: TextTheme(
-                  bodyMedium: GoogleFonts.nunito(fontSize: 16, height: 1.5),
-                ),
-              )),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMcqCard(
-      String question,
-      List<String> options,
-      int correctIndex,
-      Color secondary,
-      Color success,
-      Color error,
-      int? groupValue,
-      ValueChanged<int?> onChanged) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: secondary.withAlpha(128), width: 2),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(question,
-                style: GoogleFonts.nunito(
-                    fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            ...options.asMap().entries.map((entry) {
-              int idx = entry.key;
-              String text = entry.value;
-              return ListTile(
-                title: Text(text, style: GoogleFonts.nunito()),
-                leading: Radio<int>(
-                  value: idx,
-                  // ignore: deprecated_member_use
-                  groupValue: groupValue,
-                  // ignore: deprecated_member_use
-                  onChanged: onChanged,
-                  activeColor: success,
-                ),
-                onTap: () => onChanged(idx),
-              );
-            }),
-          ],
+    return const Padding(
+      padding: EdgeInsets.all(8.0),
+      child: SizedBox(
+        width: 32,
+        height: 32,
+        child: CircularProgressIndicator(
+          value: 0.2, // 20% de progression
+          strokeWidth: 3,
+          backgroundColor: Colors.grey,
+          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1E88E5)),
         ),
       ),
     );
