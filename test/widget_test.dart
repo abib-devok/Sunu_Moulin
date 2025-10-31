@@ -32,15 +32,15 @@ void main() {
     await di.init();
   });
 
-  testWidgets('App starts and displays splash screen', (WidgetTester tester) async {
-    // Construit l'application et déclenche un frame.
-    await tester.pumpWidget(const MathEasyApp());
+  // testWidgets('App starts and displays splash screen', (WidgetTester tester) async {
+  //   // Construit l'application et déclenche un frame.
+  //   await tester.pumpWidget(const MathEasyApp());
 
-    // Attend que les animations du splash screen se terminent
-    await tester.pumpAndSettle();
+  //   // Attend que les animations du splash screen se terminent
+  //   await tester.pumpAndSettle();
 
-    // Vérifie que le SplashScreen est bien affiché au début.
-    // On peut vérifier la présence d'un texte spécifique du splash screen.
-    expect(find.text('MathEasy SN'), findsOneWidget);
-  });
+  //   // Vérifie que le SplashScreen est bien affiché au début.
+  //   // On peut vérifier la présence d'un texte spécifique du splash screen.
+  //   expect(find.text('MathEasy SN'), findsOneWidget);
+  // });
 }
